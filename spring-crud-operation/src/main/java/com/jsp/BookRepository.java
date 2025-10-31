@@ -1,7 +1,29 @@
 package com.jsp;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-public interface BookRepository extends JpaRepository<Book, Integer>{
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+public interface BookRepository extends JpaRepository<Book, Integer> {
+
+	List<Book> findByAuthor(String author);
+
+	List<Book> findByAuthorAndGenre(String author, String genre);
+
+	List<Book> findByPriceGreaterThan(Double price);
+
+	List<Book> findByPriceLessThan(Double price);
+
+	List<Book> findByPriceBetween(Double stratprice, Double endprice);
+
+	@Query("select b from Book b where b.publishedYear=1960")
+	List<Book> getBooksByPublishedYear();
+
+	@Query("select b from Book b where b.availability=?1")
+	List<Book> getBooksByAvailability(Boolean availability);
+
+	@Query("select b from Book b where b.genre = :genre")
+	List<Book> getBooksByGenre(String genre);
 
 }
