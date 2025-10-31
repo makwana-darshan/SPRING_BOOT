@@ -1,4 +1,4 @@
-package com.jsp;
+package com.jsp.exception;
 
 public class IdNotFoundException extends RuntimeException{
 

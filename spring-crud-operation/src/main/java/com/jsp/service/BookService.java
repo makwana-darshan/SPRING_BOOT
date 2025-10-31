@@ -1,4 +1,4 @@
-package com.jsp;
+package com.jsp.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,60 +6,64 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("/book")
-public class BookController {
+import com.jsp.dao.BookDao;
+import com.jsp.dto.ResponseStructure;
+import com.jsp.entity.Book;
+import com.jsp.exception.IdNotFoundException;
+import com.jsp.exception.NoRecordAvailableException;
+import com.jsp.repository.BookRepository;
+
+@Service
+public class BookService {
+
+	@Autowired
+	private BookDao bookDao;
 
 	@Autowired
 	private BookRepository bookRepository;
 
-	// Create a single book
-	@PostMapping
-	public ResponseEntity<ResponseStructure<Book>> saveBook(@RequestBody Book book) {
-		Book savedBook = bookRepository.save(book);
-
+	// Save a single book
+	public ResponseEntity<ResponseStructure<Book>> saveBook(Book book) {
 		ResponseStructure<Book> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.CREATED.value());
 		response.setMessage("Book saved successfully!");
-		response.setData(savedBook);
+		response.setData(bookDao.saveBook(book));
 
 		return new ResponseEntity<ResponseStructure<Book>>(response, HttpStatus.CREATED);
 	}
 
-	// Create multiple books
-	@PostMapping("/all")
-	public ResponseEntity<ResponseStructure<List<Book>>> saveAllBooks(@RequestBody List<Book> books) {
-		List<Book> savedBooks = bookRepository.saveAll(books);
-
+	// Save all books
+	public ResponseEntity<ResponseStructure<List<Book>>> saveAllBook(List<Book> books) {
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.CREATED.value());
 		response.setMessage("All books saved successfully!");
-		response.setData(savedBooks);
-
-		return new ResponseEntity<ResponseStructure<List<Book>>>(HttpStatus.CREATED);
-	}
-
-	// Get all books
-	@GetMapping
-	public ResponseEntity<ResponseStructure<List<Book>>> getAllBooks() {
-		List<Book> books = bookRepository.findAll();
-
-		ResponseStructure<List<Book>> response = new ResponseStructure<>();
-		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("All books fetched successfully!");
-		response.setData(books);
+		response.setData(bookDao.saveAllBook(books));
 
 		return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.CREATED);
 	}
 
-	// Get book by ID
-	@GetMapping("/{id}")
-	public ResponseEntity<ResponseStructure<Book>> getBookById(@PathVariable Integer id) {
-		Optional<Book> optionalBook = bookRepository.findById(id);
+	// Get all books
+	public ResponseEntity<ResponseStructure<List<Book>>> getAllBook() {
+		List<Book> books = bookDao.getAllBook();
+		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
+		if (!books.isEmpty()) {
+			response.setStatusCode(HttpStatus.OK.value());
+			response.setMessage("All books fetched successfully!");
+			response.setData(books);
+			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
+		} else {
+			throw new NoRecordAvailableException("No books available!");
+		}
+	}
+
+	// Get book by ID
+	public ResponseEntity<ResponseStructure<Book>> getBookById(Integer id) {
+		Optional<Book> optionalBook = bookRepository.findById(id);
 		ResponseStructure<Book> response = new ResponseStructure<>();
+
 		if (optionalBook.isPresent()) {
 			response.setStatusCode(HttpStatus.OK.value());
 			response.setMessage("Book found!");
@@ -68,15 +72,13 @@ public class BookController {
 		} else {
 			throw new IdNotFoundException("Book not found for ID: " + id);
 		}
-
 	}
 
 	// Update book
-	@PutMapping
-	public ResponseEntity<ResponseStructure<Book>> updateBook(@RequestBody Book book) {
+	public ResponseEntity<ResponseStructure<Book>> updateBook(Book book) {
 		ResponseStructure<Book> response = new ResponseStructure<>();
-
 		Optional<Book> optional = bookRepository.findById(book.getId());
+
 		if (optional.isPresent()) {
 			Book updatedBook = bookRepository.save(book);
 			response.setStatusCode(HttpStatus.OK.value());
@@ -84,19 +86,17 @@ public class BookController {
 			response.setData(updatedBook);
 			return new ResponseEntity<ResponseStructure<Book>>(response, HttpStatus.OK);
 		} else {
-			throw new IdNotFoundException("Book not found for ID: ");
+			throw new IdNotFoundException("Book not found for ID: " + book.getId());
 		}
-
 	}
 
 	// Delete book by ID
-	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseStructure<String>> deleteBook(@PathVariable Integer id) {
+	public ResponseEntity<ResponseStructure<String>> deleteBook(Integer id) {
+		Optional<Book> opt = bookRepository.findById(id);
 		ResponseStructure<String> response = new ResponseStructure<>();
 
-		Optional<Book> opt = bookRepository.findById(id);
 		if (opt.isPresent()) {
-			bookRepository.delete(opt.get());
+			bookDao.deleteBook(opt.get());
 			response.setStatusCode(HttpStatus.OK.value());
 			response.setMessage("Book deleted successfully!");
 			response.setData("Deleted book with ID: " + id);
@@ -104,137 +104,126 @@ public class BookController {
 		} else {
 			throw new IdNotFoundException("Book not found for ID: " + id);
 		}
-
 	}
 
-	// find by author
-	@GetMapping("/author/{author}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBookByAuthod(@PathVariable String author) {
+	// Find by author
+	public ResponseEntity<ResponseStructure<List<Book>>> findByAuthor(String author) {
 		List<Book> books = bookRepository.findByAuthor(author);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Book record with author " + author + " is found");
+			response.setMessage("Books by author " + author + " found!");
 			response.setData(books);
 			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
-			throw new NoRecordAvailableException("Book record with author " + author + " is not exist");
+			throw new NoRecordAvailableException("No books found by author " + author);
 		}
 	}
 
-	// find by author and genre
-	@GetMapping("/author/{author}/genre/{genre}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBookByAuthodAndGenre(@PathVariable String author,
-			@PathVariable String genre) {
+	// Find by author and genre
+	public ResponseEntity<ResponseStructure<List<Book>>> findByAuthorAndGenre(String author, String genre) {
 		List<Book> books = bookRepository.findByAuthorAndGenre(author, genre);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Book record with author " + author + " is found");
+			response.setMessage("Books found by author " + author + " and genre " + genre);
 			response.setData(books);
 			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
-			throw new NoRecordAvailableException(
-					"Book record with author " + author + "And Genre is" + genre + " is not exist");
+			throw new NoRecordAvailableException("No books found by author " + author + " and genre " + genre);
 		}
 	}
 
-	// find By Price GreaterThan
-	@GetMapping("/price/greaterthan/{price}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBookByGreaterThanPrice(@PathVariable Double price) {
+	// Find books with price greater than
+	public ResponseEntity<ResponseStructure<List<Book>>> findByPriceGreaterThan(Double price) {
 		List<Book> books = bookRepository.findByPriceGreaterThan(price);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Book record with greaterthan price" + price + " is found");
+			response.setMessage("Books with price greater than " + price + " found!");
 			response.setData(books);
 			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
-			throw new NoRecordAvailableException("Book record with greaterthan price" + price + "  is not exist");
+			throw new NoRecordAvailableException("No books found with price greater than " + price);
 		}
 	}
 
-	// find By Price Less Than
-	@GetMapping("/price/lessthan/{price}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBookByLessThanPrice(@PathVariable Double price) {
+	// Find books with price less than
+	public ResponseEntity<ResponseStructure<List<Book>>> findByPriceLessThan(Double price) {
 		List<Book> books = bookRepository.findByPriceLessThan(price);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Book record with lessthan price" + price + " is found");
+			response.setMessage("Books with price less than " + price + " found!");
 			response.setData(books);
 			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
-			throw new NoRecordAvailableException("Book record with lessthan price" + price + "  is not exist");
+			throw new NoRecordAvailableException("No books found with price less than " + price);
 		}
 	}
 
-	// find By Price Between
-	@GetMapping("/price/between/{stratprice}/{endprice}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBookByPriceBetween(@PathVariable Double stratprice,
-			@PathVariable Double endprice) {
-		List<Book> books = bookRepository.findByPriceBetween(stratprice, endprice);
+	// Find books between price range
+	public ResponseEntity<ResponseStructure<List<Book>>> findByPriceBetween(Double startPrice, Double endPrice) {
+		List<Book> books = bookRepository.findByPriceBetween(startPrice, endPrice);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Book record with stratprice " + stratprice + " and endprice" + endprice + " is found");
+			response.setMessage("Books with price between " + startPrice + " and " + endPrice + " found!");
 			response.setData(books);
 			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
 			throw new NoRecordAvailableException(
-					"Book record with stratprice " + stratprice + " and endprice" + endprice + " is not found");
+					"No books found with price between " + startPrice + " and " + endPrice);
 		}
 	}
 
-	@GetMapping("/year/1960")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByPublishedYear1960() {
+	// Find books published in 1960
+	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByPublishedYear() {
 		List<Book> books = bookRepository.getBooksByPublishedYear();
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Books published in year 1960 found");
+			response.setMessage("Books published in year 1960 found!");
 			response.setData(books);
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
 			throw new NoRecordAvailableException("No books found for year 1960");
 		}
 	}
 
-	@GetMapping("/availability/{availability}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByAvailability(@PathVariable Boolean availability) {
+	// Find by availability
+	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByAvailability(Boolean availability) {
 		List<Book> books = bookRepository.getBooksByAvailability(availability);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Books with availability = " + availability + " found");
+			response.setMessage("Books with availability = " + availability + " found!");
 			response.setData(books);
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
 			throw new NoRecordAvailableException("No books found with availability = " + availability);
 		}
 	}
 
-	// using Query
-	@GetMapping("/genre/{genre}")
-	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByGenre(@PathVariable String genre) {
+	// Find by genre
+	public ResponseEntity<ResponseStructure<List<Book>>> getBookByGenre(String genre) {
 		List<Book> books = bookRepository.getBooksByGenre(genre);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Books with genre '" + genre + "' found");
+			response.setMessage("Books with genre " + genre + " found!");
 			response.setData(books);
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
-			throw new NoRecordAvailableException("No books found with genre " + genre );
+			throw new NoRecordAvailableException("No books found with genre " + genre);
 		}
 	}
-
 }

@@ -1,4 +1,4 @@
-package com.jsp;
+package com.jsp.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

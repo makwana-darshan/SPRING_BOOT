@@ -1,4 +1,4 @@
-package com.jsp;
+package com.jsp.dto;
 
 public class ResponseStructure<T> {
 	private int statusCode;
