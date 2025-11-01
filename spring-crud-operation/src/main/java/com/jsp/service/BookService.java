@@ -21,9 +21,6 @@ public class BookService {
 	@Autowired
 	private BookDao bookDao;
 
-	@Autowired
-	private BookRepository bookRepository;
-
 	// Save a single book
 	public ResponseEntity<ResponseStructure<Book>> saveBook(Book book) {
 		ResponseStructure<Book> response = new ResponseStructure<>();
@@ -61,7 +58,7 @@ public class BookService {
 
 	// Get book by ID
 	public ResponseEntity<ResponseStructure<Book>> getBookById(Integer id) {
-		Optional<Book> optionalBook = bookRepository.findById(id);
+		Optional<Book> optionalBook = bookDao.getBookById(id);
 		ResponseStructure<Book> response = new ResponseStructure<>();
 
 		if (optionalBook.isPresent()) {
@@ -77,10 +74,10 @@ public class BookService {
 	// Update book
 	public ResponseEntity<ResponseStructure<Book>> updateBook(Book book) {
 		ResponseStructure<Book> response = new ResponseStructure<>();
-		Optional<Book> optional = bookRepository.findById(book.getId());
+		Optional<Book> optional = bookDao.getBookById(book.getId());
 
 		if (optional.isPresent()) {
-			Book updatedBook = bookRepository.save(book);
+			Book updatedBook = bookDao.saveBook(book);
 			response.setStatusCode(HttpStatus.OK.value());
 			response.setMessage("Book updated successfully!");
 			response.setData(updatedBook);
@@ -92,7 +89,7 @@ public class BookService {
 
 	// Delete book by ID
 	public ResponseEntity<ResponseStructure<String>> deleteBook(Integer id) {
-		Optional<Book> opt = bookRepository.findById(id);
+		Optional<Book> opt = bookDao.getBookById(id);
 		ResponseStructure<String> response = new ResponseStructure<>();
 
 		if (opt.isPresent()) {
@@ -108,7 +105,7 @@ public class BookService {
 
 	// Find by author
 	public ResponseEntity<ResponseStructure<List<Book>>> findByAuthor(String author) {
-		List<Book> books = bookRepository.findByAuthor(author);
+		List<Book> books = bookDao.findByAuthor(author);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -123,7 +120,7 @@ public class BookService {
 
 	// Find by author and genre
 	public ResponseEntity<ResponseStructure<List<Book>>> findByAuthorAndGenre(String author, String genre) {
-		List<Book> books = bookRepository.findByAuthorAndGenre(author, genre);
+		List<Book> books = bookDao.findByAuthorAndGenre(author, genre);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -138,7 +135,7 @@ public class BookService {
 
 	// Find books with price greater than
 	public ResponseEntity<ResponseStructure<List<Book>>> findByPriceGreaterThan(Double price) {
-		List<Book> books = bookRepository.findByPriceGreaterThan(price);
+		List<Book> books = bookDao.findByPriceGreaterThan(price);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -153,7 +150,7 @@ public class BookService {
 
 	// Find books with price less than
 	public ResponseEntity<ResponseStructure<List<Book>>> findByPriceLessThan(Double price) {
-		List<Book> books = bookRepository.findByPriceLessThan(price);
+		List<Book> books = bookDao.findByPriceLessThan(price);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -168,7 +165,7 @@ public class BookService {
 
 	// Find books between price range
 	public ResponseEntity<ResponseStructure<List<Book>>> findByPriceBetween(Double startPrice, Double endPrice) {
-		List<Book> books = bookRepository.findByPriceBetween(startPrice, endPrice);
+		List<Book> books = bookDao.findByPriceBetween(startPrice, endPrice);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -184,7 +181,7 @@ public class BookService {
 
 	// Find books published in 1960
 	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByPublishedYear() {
-		List<Book> books = bookRepository.getBooksByPublishedYear();
+		List<Book> books = bookDao.getBooksByPublishedYear();
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -199,7 +196,7 @@ public class BookService {
 
 	// Find by availability
 	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByAvailability(Boolean availability) {
-		List<Book> books = bookRepository.getBooksByAvailability(availability);
+		List<Book> books = bookDao.getBooksByAvailability(availability);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
@@ -214,7 +211,7 @@ public class BookService {
 
 	// Find by genre
 	public ResponseEntity<ResponseStructure<List<Book>>> getBookByGenre(String genre) {
-		List<Book> books = bookRepository.getBooksByGenre(genre);
+		List<Book> books = bookDao.getBooksByGenre(genre);
 		ResponseStructure<List<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {
