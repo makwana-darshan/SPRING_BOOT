@@ -13,7 +13,6 @@ import com.jsp.dto.ResponseStructure;
 import com.jsp.entity.Book;
 import com.jsp.exception.IdNotFoundException;
 import com.jsp.exception.NoRecordAvailableException;
-import com.jsp.repository.BookRepository;
 
 @Service
 public class BookService {
