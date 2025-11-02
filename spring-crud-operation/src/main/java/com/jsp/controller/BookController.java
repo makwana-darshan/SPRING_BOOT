@@ -3,6 +3,7 @@ package com.jsp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -104,5 +105,18 @@ public class BookController {
 	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByGenre(@PathVariable String genre) {
 		return bookService.getBookByGenre(genre);
 	}
+	// pagination
+	@GetMapping("/paging/{pageNumber}/{pageSize}")
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBooksByPaging(@PathVariable int pageNumber,
+			@PathVariable int pageSize) {
+		return bookService.getBookByPage(pageNumber, pageSize);
+	}
+	
+	@GetMapping("/paging/{pageNumber}/{pageSize}/{field}")
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBooksByPaging(@PathVariable int pageNumber,
+			@PathVariable int pageSize,@PathVariable String field) {
+		return bookService.getBookByPageAndSort(pageNumber, pageSize,field);
+	}
+	
 
 }

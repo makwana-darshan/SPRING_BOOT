@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -220,6 +221,36 @@ public class BookService {
 			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
 		} else {
 			throw new NoRecordAvailableException("No books found with genre " + genre);
+
 		}
 	}
+
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBookByPage(int PageNumber, int pageSize) {
+		Page<Book> books = bookDao.getBookByPaging(PageNumber, pageSize);
+		ResponseStructure<Page<Book>> response = new ResponseStructure<>();
+
+		if (!books.isEmpty()) {
+			response.setStatusCode(HttpStatus.OK.value());
+			response.setMessage("Books found");
+			response.setData(books);
+			return new ResponseEntity<ResponseStructure<Page<Book>>>(response, HttpStatus.OK);
+		} else {
+			throw new NoRecordAvailableException("No books found ");
+		}
+	}
+	
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBookByPageAndSort(int PageNumber, int pageSize,String field) {
+		Page<Book> books = bookDao.getBookByPageAndSort(PageNumber, pageSize,field);
+		ResponseStructure<Page<Book>> response = new ResponseStructure<>();
+
+		if (!books.isEmpty()) {
+			response.setStatusCode(HttpStatus.OK.value());
+			response.setMessage("Books found");
+			response.setData(books);
+			return new ResponseEntity<ResponseStructure<Page<Book>>>(response, HttpStatus.OK);
+		} else {
+			throw new NoRecordAvailableException("No books found ");
+		}
+	}
+
 }
