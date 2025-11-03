@@ -238,9 +238,24 @@ public class BookService {
 			throw new NoRecordAvailableException("No books found ");
 		}
 	}
-	
-	public ResponseEntity<ResponseStructure<Page<Book>>> getBookByPageAndSort(int PageNumber, int pageSize,String field) {
-		Page<Book> books = bookDao.getBookByPageAndSort(PageNumber, pageSize,field);
+
+	public ResponseEntity<ResponseStructure<List<Book>>> getBookBySort(String field) {
+		List<Book> books = bookDao.getBookBySort(field);
+		ResponseStructure<List<Book>> response = new ResponseStructure<>();
+
+		if (!books.isEmpty()) {
+			response.setStatusCode(HttpStatus.OK.value());
+			response.setMessage("Books found");
+			response.setData(books);
+			return new ResponseEntity<ResponseStructure<List<Book>>>(response, HttpStatus.OK);
+		} else {
+			throw new NoRecordAvailableException("No books found ");
+		}
+	}
+
+	public ResponseEntity<ResponseStructure<Page<Book>>> getBookByPageAndSort(int PageNumber, int pageSize,
+			String field) {
+		Page<Book> books = bookDao.getBookByPageAndSort(PageNumber, pageSize, field);
 		ResponseStructure<Page<Book>> response = new ResponseStructure<>();
 
 		if (!books.isEmpty()) {

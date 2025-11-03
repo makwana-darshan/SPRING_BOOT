@@ -78,9 +78,12 @@ public class BookDao {
 		return bookRepository.findAll(PageRequest.of(pageNumber, pageSize));
 
 	}
-	
-	public Page<Book> getBookByPageAndSort(int pagenumber,int pagesize,String field)
-	{
-		return bookRepository.findAll(PageRequest.of(pagenumber, pagesize,Sort.by(field).descending()));
+
+	public List<Book> getBookBySort(String field) {
+		return bookRepository.findAll(Sort.by(field).descending());
+	}
+
+	public Page<Book> getBookByPageAndSort(int pagenumber, int pagesize, String field) {
+		return bookRepository.findAll(PageRequest.of(pagenumber, pagesize, Sort.by(field).descending()));
 	}
 }
