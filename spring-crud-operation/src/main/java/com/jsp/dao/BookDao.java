@@ -80,7 +80,7 @@ public class BookDao {
 	}
 
 	public List<Book> getBookBySort(String field) {
-		return bookRepository.findAll(Sort.by(field).descending());
+		return bookRepository.findAll(Sort.by(field).ascending());
 	}
 
 	public Page<Book> getBookByPageAndSort(int pagenumber, int pagesize, String field) {

@@ -113,11 +113,12 @@ public class BookController {
 		return bookService.getBookByPage(pageNumber, pageSize);
 	}
 
+	// sorting
 	@GetMapping("/{field}")
 	public ResponseEntity<ResponseStructure<List<Book>>> getBooksByPaging(@PathVariable String field) {
 		return bookService.getBookBySort(field);
 	}
-
+	// paging and sorting
 	@GetMapping("/paging/{pageNumber}/{pageSize}/{field}")
 	public ResponseEntity<ResponseStructure<Page<Book>>> getBooksByPaging(@PathVariable int pageNumber,
 			@PathVariable int pageSize, @PathVariable String field) {
