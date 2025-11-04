@@ -8,7 +8,7 @@
 		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.fligthbooking</groupId>
+	<groupId>com.flightbooking</groupId>
 	<artifactId>FligthBookingSystem</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Fligth_Booking_System</name>

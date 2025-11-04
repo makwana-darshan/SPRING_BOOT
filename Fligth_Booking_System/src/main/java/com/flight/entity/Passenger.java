@@ -1,11 +1,7 @@
-package com.fligth.entity;
+package com.flight.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Data
 @Entity
@@ -19,7 +15,8 @@ public class Passenger {
 	private String gender;
 	private String seatNumber;
 	private Long contactNumber;
-	
+
 	@ManyToOne
+	@JoinColumn(name = "booking_id")
 	private Booking booking;
 }
