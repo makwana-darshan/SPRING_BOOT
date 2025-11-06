@@ -60,7 +60,7 @@ public class FlightDao {
 	}
 	
 	// paging and sorting
-	public Page<Flight> getBookByPageAndSort(int pagenumber, int pagesize, String field) {
+	public Page<Flight> getFlightByPageAndSort(int pagenumber, int pagesize, String field) {
 		return flightRepository.findAll(PageRequest.of(pagenumber, pagesize, Sort.by(field).ascending()));
 	}
 }

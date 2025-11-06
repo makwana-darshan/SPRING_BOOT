@@ -135,7 +135,7 @@ public class FlightService {
 
     // Get flight records with pagination and sorting
     public ResponseEntity<ResponseStructure<Page<Flight>>> getFlightByPageAndSort(int pageNumber, int pageSize, String field) {
-        Page<Flight> flights = flightDao.getBookByPageAndSort(pageNumber, pageSize, field);
+        Page<Flight> flights = flightDao.getFlightByPageAndSort(pageNumber, pageSize, field);
         ResponseStructure<Page<Flight>> response = new ResponseStructure<>();
 
         if (!flights.isEmpty()) {

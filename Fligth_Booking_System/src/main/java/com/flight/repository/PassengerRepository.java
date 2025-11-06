@@ -6,4 +6,5 @@ import com.flight.entity.Passenger;
 
 public interface PassengerRepository extends JpaRepository<Passenger, Integer> {
 
+	Passenger getByContactNumber(Long number);
 }

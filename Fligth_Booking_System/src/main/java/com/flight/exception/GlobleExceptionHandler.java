@@ -29,4 +29,14 @@ public class GlobleExceptionHandler extends ResponseEntityExceptionHandler {
 		response.setData(exception.getMessage());
 		return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ResponseStructure<String>> handleIllegalArgument(IllegalArgumentException ex) {
+		ResponseStructure<String> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		response.setMessage("Invalid value! " + ex.getMessage());
+		response.setData(null);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
 }

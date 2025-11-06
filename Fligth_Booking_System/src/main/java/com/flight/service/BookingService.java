@@ -16,7 +16,7 @@ public class BookingService {
 	private BookingDao bookingDao;
 
 	public ResponseEntity<ResponseStructure<Booking>> saveBooking(Booking booking) {
-
+		
 		ResponseStructure<Booking> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.CREATED.value());
 		response.setMessage("data success..");
