@@ -2,6 +2,7 @@ package com.flight.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flight.dto.PaymentStatus;
 
 import jakarta.persistence.*;
@@ -23,5 +24,6 @@ public class Payment {
 	private PaymentStatus status;
 
 	@OneToOne(mappedBy = "payment")
+	@JsonIgnore
 	private Booking booking;
 }

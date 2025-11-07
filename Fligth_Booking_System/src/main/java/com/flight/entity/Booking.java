@@ -12,11 +12,11 @@ public class Booking {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
+	
 	private LocalDateTime bookingDate;
 	private String status;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "flight_id")
 	private Flight flight;
 
