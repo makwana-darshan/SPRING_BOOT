@@ -76,7 +76,7 @@ public class BookingController {
 	@GetMapping("/paging/{pageNumber}/{pageSize}/{field}")
 	public ResponseEntity<ResponseStructure<Page<Booking>>> getBookingPageAndSort(@PathVariable Integer pageNumber,
 			@PathVariable Integer pageSize, @PathVariable String field) {
-		return bookingService.getFlightByPageAndSort(pageNumber, pageSize, field);
+		return bookingService.getBookingByPageAndSort(pageNumber, pageSize, field);
 	}
 
 }

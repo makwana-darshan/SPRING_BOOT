@@ -146,18 +146,18 @@ public class BookingService {
 	}
 
 	// paging and sorting
-	public ResponseEntity<ResponseStructure<Page<Booking>>> getFlightByPageAndSort(int pageNumber, int pageSize,
+	public ResponseEntity<ResponseStructure<Page<Booking>>> getBookingByPageAndSort(int pageNumber, int pageSize,
 			String field) {
 		Page<Booking> bookings = bookingDao.getBookingPageAndSort(pageNumber, pageSize, field);
 		ResponseStructure<Page<Booking>> response = new ResponseStructure<>();
 
 		if (!bookings.isEmpty()) {
 			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Flights retrieved successfully with pagination and sorting by " + field + "!");
+			response.setMessage("Booking retrieved successfully with pagination and sorting by " + field + "!");
 			response.setData(bookings);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} else {
-			throw new NoRecordAvailableException("No flight records found!");
+			throw new NoRecordAvailableException("No Booking records found!");
 		}
 	}
 }
