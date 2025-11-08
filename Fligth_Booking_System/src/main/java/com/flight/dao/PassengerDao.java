@@ -14,36 +14,37 @@ import com.flight.repository.PassengerRepository;
 
 @Repository
 public class PassengerDao {
-	@Autowired
-	private PassengerRepository passengerRepository;
 
-	// add passenger
-	public Passenger savePassenger(Passenger passenger) {
-		return passengerRepository.save(passenger);
-	}
+    @Autowired
+    private PassengerRepository passengerRepository;
 
-	// get all passenger
-	public List<Passenger> getAllPassengers() {
-		return passengerRepository.findAll();
-	}
+    // Add passenger
+    public Passenger savePassenger(Passenger passenger) {
+        return passengerRepository.save(passenger);
+    }
 
-	// get passenger by id
-	public Optional<Passenger> getPassengerById(Integer id) {
-		return passengerRepository.findById(id);
-	}
+    // Get all passengers
+    public List<Passenger> getAllPassengers() {
+        return passengerRepository.findAll();
+    }
 
-	// update passenger
-	public Passenger updatePassenger(Passenger passenger) {
-		return passengerRepository.save(passenger);
-	}
+    // Get passenger by ID
+    public Optional<Passenger> getPassengerById(Integer id) {
+        return passengerRepository.findById(id);
+    }
 
-	// get passenger by contact number
-	public Passenger getPassengerByContactNumber(Long number) {
-		return passengerRepository.getByContactNumber(number);
-	}
+    // Update passenger
+    public Passenger updatePassenger(Passenger passenger) {
+        return passengerRepository.save(passenger);
+    }
 
-	// paging and sorting
-	public Page<Passenger> getPassengerByPageAndSort(int pagenumber, int pagesize, String field) {
-		return passengerRepository.findAll(PageRequest.of(pagenumber, pagesize, Sort.by(field).ascending()));
-	}
+    // Get passenger by contact number
+    public Passenger getPassengerByContactNumber(Long number) {
+        return passengerRepository.getByContactNumber(number);
+    }
+
+    // Pagination and sorting
+    public Page<Passenger> getPassengerByPageAndSort(int pageNumber, int pageSize, String field) {
+        return passengerRepository.findAll(PageRequest.of(pageNumber, pageSize, Sort.by(field).ascending()));
+    }
 }

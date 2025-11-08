@@ -5,13 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.flight.dto.ResponseStructure;
 import com.flight.entity.Passenger;
@@ -24,40 +18,40 @@ public class PassengerController {
 	@Autowired
 	private PassengerService passengerService;
 
-	// add passenger
+	// Add passenger
 	@PostMapping
-	public ResponseEntity<ResponseStructure<Passenger>> savePassnger(@RequestBody Passenger passenger) {
-		return passengerService.savePassnger(passenger);
+	public ResponseEntity<ResponseStructure<Passenger>> savePassenger(@RequestBody Passenger passenger) {
+		return passengerService.savePassenger(passenger);
 	}
 
-	// get all passenger
-	@GetMapping("/all")
-	public ResponseEntity<ResponseStructure<List<Passenger>>> getAllPassenger() {
-		return passengerService.getAllPassenger();
+	// Get all passengers
+	@GetMapping
+	public ResponseEntity<ResponseStructure<List<Passenger>>> getAllPassengers() {
+		return passengerService.getAllPassengers();
 	}
 
-	// get passenger by id
-	@GetMapping("/id/{id}")
-	public ResponseEntity<ResponseStructure<Passenger>> getPassngerById(@PathVariable Integer id) {
-		return passengerService.getPassngerById(id);
+	// Get passenger by ID
+	@GetMapping("/{id}")
+	public ResponseEntity<ResponseStructure<Passenger>> getPassengerById(@PathVariable Integer id) {
+		return passengerService.getPassengerById(id);
 	}
 
-	// update passenger
+	// Update passenger
 	@PutMapping
-	public ResponseEntity<ResponseStructure<Passenger>> updatePassnger(@RequestBody Passenger passenger) {
+	public ResponseEntity<ResponseStructure<Passenger>> updatePassenger(@RequestBody Passenger passenger) {
 		return passengerService.updatePassenger(passenger);
 	}
 
-	// get passenger by contact number
-	@GetMapping("/contactnumber/{number}")
+	// Get passenger by contact number
+	@GetMapping("/contact/{number}")
 	public ResponseEntity<ResponseStructure<Passenger>> getPassengerByContactNumber(@PathVariable Long number) {
-		return passengerService.getPassngerByContactNumber(number);
+		return passengerService.getPassengerByContactNumber(number);
 	}
-	// get passenger page and sort
 
-	@GetMapping("/pageandsort/{pageNumber}/{pageSize}/{field}")
-	public ResponseEntity<ResponseStructure<Page<Passenger>>> getPassengerByPageAndSort(
-			@PathVariable Integer pageNumber, @PathVariable Integer pageSize, @PathVariable String field) {
+	// Get passengers with pagination and sorting
+	@GetMapping("/paging/{pageNumber}/{pageSize}/{field}")
+	public ResponseEntity<ResponseStructure<Page<Passenger>>> getPassengersByPagingAndSort(@PathVariable int pageNumber,
+			@PathVariable int pageSize, @PathVariable String field) {
 		return passengerService.getPassengerByPageAndSort(pageNumber, pageSize, field);
 	}
 }

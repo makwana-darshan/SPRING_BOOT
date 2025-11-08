@@ -17,6 +17,7 @@ import com.flight.dto.ResponseStructure;
 import com.flight.entity.Booking;
 import com.flight.entity.Flight;
 import com.flight.entity.Passenger;
+import com.flight.entity.Payment;
 import com.flight.exception.IdNotFoundException;
 import com.flight.exception.NoRecordAvailableException;
 
@@ -29,135 +30,216 @@ public class BookingService {
 	@Autowired
 	private FlightDao flightDao;
 
-	// save booking
+	// Add a booking
 	public ResponseEntity<ResponseStructure<Booking>> saveBooking(Booking booking) {
-
 		ResponseStructure<Booking> response = new ResponseStructure<>();
 
-		if (booking.getFlight() != null && booking.getFlight().getId() != null) {
-			Optional<Flight> flightOpt = flightDao.getFlightById(booking.getFlight().getId());
-			if (flightOpt.isEmpty()) {
-				throw new IdNotFoundException("Flight not found for ID: " + booking.getFlight().getId());
-			}
-			booking.setFlight(flightOpt.get());
-		} else {
-			throw new IdNotFoundException("Flight ID is required for booking!");
+		if (booking.getFlight() == null || booking.getFlight().getId() == null) {
+			throw new IdNotFoundException("Flight ID is required to create a booking.");
 		}
+
+		Optional<Flight> flightOpt = flightDao.getFlightById(booking.getFlight().getId());
+		if (flightOpt.isEmpty()) {
+			throw new IdNotFoundException("Flight not found for ID: " + booking.getFlight().getId());
+		}
+
+		booking.setFlight(flightOpt.get());
 
 		if (booking.getPassengers() != null && !booking.getPassengers().isEmpty()) {
-			for (Passenger passenger : booking.getPassengers()) {
-				passenger.setBooking(booking);
-			}
+			booking.getPassengers().forEach(p -> p.setBooking(booking));
 		}
 
 		response.setStatusCode(HttpStatus.CREATED.value());
-		response.setMessage("data success..");
+		response.setMessage("Booking created successfully.");
 		response.setData(bookingDao.saveBooking(booking));
 
-		return new ResponseEntity<ResponseStructure<Booking>>(response, HttpStatus.CREATED);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	// save multiple booking
-	public ResponseEntity<ResponseStructure<List<Booking>>> saveAllBooking(List<Booking> bookings) {
+	// Add multiple bookings
+	public ResponseEntity<ResponseStructure<List<Booking>>> saveAllBookings(List<Booking> bookings) {
 		ResponseStructure<List<Booking>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.CREATED.value());
-		response.setMessage("data success..");
+		response.setMessage("Multiple bookings added successfully.");
 		response.setData(bookingDao.saveAllBooking(bookings));
-
-		return new ResponseEntity<ResponseStructure<List<Booking>>>(response, HttpStatus.CREATED);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	// get all booking
-	public ResponseEntity<ResponseStructure<List<Booking>>> getAllBooking() {
+	// Get all bookings
+	public ResponseEntity<ResponseStructure<List<Booking>>> getAllBookings() {
+		List<Booking> bookings = bookingDao.getAllBookings();
+
+		if (bookings.isEmpty()) {
+			throw new NoRecordAvailableException("No bookings available.");
+		}
+
 		ResponseStructure<List<Booking>> response = new ResponseStructure<>();
-		response.setStatusCode(HttpStatus.CREATED.value());
-		response.setMessage("data success..");
-		response.setData(bookingDao.getAllBooking());
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("All bookings retrieved successfully.");
+		response.setData(bookings);
 
-		return new ResponseEntity<ResponseStructure<List<Booking>>>(response, HttpStatus.CREATED);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// get booking by id
+	// Get booking by ID
 	public ResponseEntity<ResponseStructure<Booking>> getBookingById(Integer id) {
 		Optional<Booking> opt = bookingDao.getBookingById(id);
-		ResponseStructure<Booking> response = new ResponseStructure<>();
-		if (opt.isPresent()) {
-			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Booking found successfully!");
-			response.setData(opt.get());
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		} else {
+
+		if (opt.isEmpty()) {
 			throw new IdNotFoundException("Booking not found for ID: " + id);
 		}
+
+		ResponseStructure<Booking> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("Booking record retrieved successfully for ID: " + id + ".");
+		response.setData(opt.get());
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// Get booking by flight ID
+	// Get bookings by flight ID
 	public ResponseEntity<ResponseStructure<List<Booking>>> getBookingByFlightId(Integer flightId) {
 		List<Booking> bookings = bookingDao.getBookingByFlightId(flightId);
+
 		if (bookings.isEmpty()) {
 			throw new NoRecordAvailableException("No bookings found for flight ID: " + flightId);
 		}
+
 		ResponseStructure<List<Booking>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Bookings retrieved successfully by flight ID!");
+		response.setMessage("Bookings retrieved successfully for flight ID: " + flightId + ".");
 		response.setData(bookings);
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// Get booking by date
+	// Get passengers for a booking
+	public ResponseEntity<ResponseStructure<List<Passenger>>> getPassengersByBookingId(Integer id) {
+		Optional<Booking> bookingOpt = bookingDao.getBookingById(id);
+
+		if (bookingOpt.isEmpty()) {
+			throw new IdNotFoundException("Booking not found for ID: " + id);
+		}
+
+		List<Passenger> passengers = bookingOpt.get().getPassengers();
+		if (passengers.isEmpty()) {
+			throw new NoRecordAvailableException("No passengers found for booking ID: " + id);
+		}
+
+		ResponseStructure<List<Passenger>> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("Passengers retrieved successfully for booking ID: " + id + ".");
+		response.setData(passengers);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	// Get payment details of a booking
+	public ResponseEntity<ResponseStructure<Payment>> getPaymentDetail(Integer id) {
+		Optional<Booking> bookingOpt = bookingDao.getBookingById(id);
+
+		if (bookingOpt.isEmpty()) {
+			throw new IdNotFoundException("Booking not found for ID: " + id);
+		}
+
+		Payment payment = bookingOpt.get().getPayment();
+
+		if (payment == null) {
+			throw new NoRecordAvailableException("No payment found for booking ID: " + id);
+		}
+
+		ResponseStructure<Payment> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("Payment details retrieved successfully for booking ID: " + id + ".");
+		response.setData(payment);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	// Get bookings by date
 	public ResponseEntity<ResponseStructure<List<Booking>>> getBookingByDate(String dateTime) {
 		LocalDateTime date = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		List<Booking> bookings = bookingDao.getBookingByDate(date);
+
 		if (bookings.isEmpty()) {
 			throw new NoRecordAvailableException("No bookings found for date: " + date);
 		}
+
 		ResponseStructure<List<Booking>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Bookings retrieved successfully for date: " + date);
+		response.setMessage("Bookings retrieved successfully for date: " + date + ".");
 		response.setData(bookings);
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// Get booking by status
+	// Update booking
+	public ResponseEntity<ResponseStructure<Booking>> updateBooking(Booking booking) {
+		Optional<Booking> opt = bookingDao.getBookingById(booking.getId());
+
+		if (opt.isEmpty()) {
+			throw new IdNotFoundException("Cannot update — Booking not found for ID: " + booking.getId());
+		}
+
+		Booking updated = bookingDao.updateBooking(booking);
+
+		ResponseStructure<Booking> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("Booking updated successfully for ID: " + booking.getId() + ".");
+		response.setData(updated);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	// Get bookings by status
 	public ResponseEntity<ResponseStructure<List<Booking>>> getBookingByStatus(String status) {
 		List<Booking> bookings = bookingDao.getBookingByStatus(status.toUpperCase());
+
 		if (bookings.isEmpty()) {
 			throw new NoRecordAvailableException("No bookings found with status: " + status);
 		}
+
 		ResponseStructure<List<Booking>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Bookings retrieved successfully by status!");
+		response.setMessage("Bookings retrieved successfully with status: " + status + ".");
 		response.setData(bookings);
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Delete booking
 	public ResponseEntity<ResponseStructure<String>> deleteBooking(Integer id) {
 		Optional<Booking> opt = bookingDao.getBookingById(id);
+
 		if (opt.isEmpty()) {
 			throw new IdNotFoundException("Booking not found for ID: " + id);
 		}
+
 		bookingDao.deleteBooking(opt.get());
+
 		ResponseStructure<String> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Booking deleted successfully!");
-		response.setData("Booking with ID " + id + " has been deleted.");
+		response.setMessage("Booking deleted successfully.");
+		response.setData("Booking with ID " + id + " was removed from the system.");
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// paging and sorting
+	// Get paginated and sorted bookings
 	public ResponseEntity<ResponseStructure<Page<Booking>>> getBookingByPageAndSort(int pageNumber, int pageSize,
 			String field) {
 		Page<Booking> bookings = bookingDao.getBookingPageAndSort(pageNumber, pageSize, field);
-		ResponseStructure<Page<Booking>> response = new ResponseStructure<>();
 
-		if (!bookings.isEmpty()) {
-			response.setStatusCode(HttpStatus.OK.value());
-			response.setMessage("Booking retrieved successfully with pagination and sorting by " + field + "!");
-			response.setData(bookings);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		} else {
-			throw new NoRecordAvailableException("No Booking records found!");
+		if (bookings.isEmpty()) {
+			throw new NoRecordAvailableException("No booking records found.");
 		}
+
+		ResponseStructure<Page<Booking>> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("Bookings retrieved successfully (page: " + pageNumber + ", size: " + pageSize
+				+ ", sorted by: " + field + ").");
+		response.setData(bookings);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

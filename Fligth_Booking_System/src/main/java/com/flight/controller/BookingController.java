@@ -5,16 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.flight.dto.ResponseStructure;
 import com.flight.entity.Booking;
+import com.flight.entity.Passenger;
+import com.flight.entity.Payment;
 import com.flight.service.BookingService;
 
 @RestController
@@ -24,22 +20,22 @@ public class BookingController {
 	@Autowired
 	private BookingService bookingService;
 
-	// add booking
+	// Add single booking
 	@PostMapping
 	public ResponseEntity<ResponseStructure<Booking>> saveBooking(@RequestBody Booking booking) {
 		return bookingService.saveBooking(booking);
 	}
 
-	// add multiple booking
+	// Add multiple bookings
 	@PostMapping("/all")
-	public ResponseEntity<ResponseStructure<List<Booking>>> saveAllBooking(@RequestBody List<Booking> bookings) {
-		return bookingService.saveAllBooking(bookings);
+	public ResponseEntity<ResponseStructure<List<Booking>>> saveAllBookings(@RequestBody List<Booking> bookings) {
+		return bookingService.saveAllBookings(bookings);
 	}
 
-	// get all booking
-	@GetMapping("/all")
-	public ResponseEntity<ResponseStructure<List<Booking>>> getAllBooking() {
-		return bookingService.getAllBooking();
+	// Get all bookings
+	@GetMapping
+	public ResponseEntity<ResponseStructure<List<Booking>>> getAllBookings() {
+		return bookingService.getAllBookings();
 	}
 
 	// Get booking by ID
@@ -48,35 +44,52 @@ public class BookingController {
 		return bookingService.getBookingById(id);
 	}
 
-	// Get booking by flight ID
+	// Get bookings by flight ID
 	@GetMapping("/flight/{flightId}")
 	public ResponseEntity<ResponseStructure<List<Booking>>> getBookingByFlightId(@PathVariable Integer flightId) {
 		return bookingService.getBookingByFlightId(flightId);
 	}
 
-	// Get booking by date
+	// Get bookings by date
 	@GetMapping("/date/{date}")
 	public ResponseEntity<ResponseStructure<List<Booking>>> getBookingByDate(@PathVariable String date) {
 		return bookingService.getBookingByDate(date);
 	}
 
-	// Get booking by status
+	// Get bookings by status
 	@GetMapping("/status/{status}")
 	public ResponseEntity<ResponseStructure<List<Booking>>> getBookingByStatus(@PathVariable String status) {
 		return bookingService.getBookingByStatus(status);
 	}
 
-	// Delete booking by ID
+	// Get passengers for a booking
+	@GetMapping("/{id}/passengers")
+	public ResponseEntity<ResponseStructure<List<Passenger>>> getPassengersByBooking(@PathVariable Integer id) {
+		return bookingService.getPassengersByBookingId(id);
+	}
+
+	// Get payment details of booking
+	@GetMapping("/{id}/payment")
+	public ResponseEntity<ResponseStructure<Payment>> getPaymentDetail(@PathVariable Integer id) {
+		return bookingService.getPaymentDetail(id);
+	}
+
+	// Update booking
+	@PutMapping
+	public ResponseEntity<ResponseStructure<Booking>> updateBooking(@RequestBody Booking booking) {
+		return bookingService.updateBooking(booking);
+	}
+
+	// Delete booking
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ResponseStructure<String>> deleteBooking(@PathVariable Integer id) {
 		return bookingService.deleteBooking(id);
 	}
 
-	// paging and sorting
+	// Pagination and sorting
 	@GetMapping("/paging/{pageNumber}/{pageSize}/{field}")
-	public ResponseEntity<ResponseStructure<Page<Booking>>> getBookingPageAndSort(@PathVariable Integer pageNumber,
-			@PathVariable Integer pageSize, @PathVariable String field) {
+	public ResponseEntity<ResponseStructure<Page<Booking>>> getBookingsByPageAndSort(@PathVariable int pageNumber,
+			@PathVariable int pageSize, @PathVariable String field) {
 		return bookingService.getBookingByPageAndSort(pageNumber, pageSize, field);
 	}
-
 }

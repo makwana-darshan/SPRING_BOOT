@@ -22,11 +22,11 @@ public class PaymentService {
 	@Autowired
 	private PaymentDao paymentDao;
 
-	// Add single payment
+	// Add a single payment
 	public ResponseEntity<ResponseStructure<Payment>> savePayment(Payment payment) {
 		ResponseStructure<Payment> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.CREATED.value());
-		response.setMessage("Payment added successfully!");
+		response.setMessage("Payment has been added successfully.");
 		response.setData(paymentDao.savePayment(payment));
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
@@ -34,99 +34,112 @@ public class PaymentService {
 	// Get all payments
 	public ResponseEntity<ResponseStructure<List<Payment>>> getAllPayments() {
 		List<Payment> payments = paymentDao.getAllPayments();
+
 		if (payments.isEmpty()) {
-			throw new NoRecordAvailableException("No payment records available!");
+			throw new NoRecordAvailableException("No payment records available.");
 		}
 
 		ResponseStructure<List<Payment>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("All payment records retrieved successfully!");
+		response.setMessage("All payment records retrieved successfully.");
 		response.setData(payments);
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Get payment by ID
 	public ResponseEntity<ResponseStructure<Payment>> getPaymentById(Integer id) {
 		Optional<Payment> opt = paymentDao.getPaymentById(id);
+
 		if (opt.isEmpty()) {
 			throw new IdNotFoundException("Payment not found for ID: " + id);
 		}
 
 		ResponseStructure<Payment> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Payment record found successfully!");
+		response.setMessage("Payment record retrieved successfully for ID: " + id + ".");
 		response.setData(opt.get());
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// Get payment by status
+	// Get payments by status
 	public ResponseEntity<ResponseStructure<List<Payment>>> getPaymentByStatus(String status) {
 		List<Payment> payments = paymentDao.getPaymentByStatus(status);
+
 		if (payments.isEmpty()) {
-			throw new NoRecordAvailableException("No payments found with status: " + status);
+			throw new NoRecordAvailableException("No payments found with status: " + status + ".");
 		}
 
 		ResponseStructure<List<Payment>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Payments retrieved successfully by status: " + status);
+		response.setMessage("Payments retrieved successfully with status: " + status + ".");
 		response.setData(payments);
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// Get payment by mode
+	// Get payments by mode
 	public ResponseEntity<ResponseStructure<List<Payment>>> getPaymentByMode(String mode) {
 		List<Payment> payments = paymentDao.getPaymentByMode(mode);
+
 		if (payments.isEmpty()) {
-			throw new NoRecordAvailableException("No payments found with mode: " + mode);
+			throw new NoRecordAvailableException("No payments found for mode: " + mode + ".");
 		}
 
 		ResponseStructure<List<Payment>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Payments retrieved successfully by mode: " + mode);
+		response.setMessage("Payments retrieved successfully with mode: " + mode + ".");
 		response.setData(payments);
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// update status
-	public ResponseEntity<ResponseStructure<Payment>> updatePaymentStatus(Integer id, String status) {
-		ResponseStructure<Payment> response = new ResponseStructure<>();
+	// Get payments greater than amount
+	public ResponseEntity<ResponseStructure<List<Payment>>> getPaymentAmountGreaterThan(Double amount) {
+		List<Payment> payments = paymentDao.getPaymentAmountGreaterThan(amount);
 
+		if (payments.isEmpty()) {
+			throw new NoRecordAvailableException("No payments found with amount greater than: " + amount + ".");
+		}
+
+		ResponseStructure<List<Payment>> response = new ResponseStructure<>();
+		response.setStatusCode(HttpStatus.OK.value());
+		response.setMessage("Payments retrieved successfully with amount greater than: " + amount + ".");
+		response.setData(payments);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	// Update payment status
+	public ResponseEntity<ResponseStructure<Payment>> updatePaymentStatus(Integer id, String status) {
 		Optional<Payment> optional = paymentDao.getPaymentById(id);
+
 		if (optional.isEmpty()) {
 			throw new IdNotFoundException("Payment not found for ID: " + id);
 		}
 
 		Payment payment = optional.get();
-
-	
 		payment.setStatus(Enum.valueOf(PaymentStatus.class, status.toUpperCase()));
 
 		Payment updatedPayment = paymentDao.savePayment(payment);
 
+		ResponseStructure<Payment> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Payment status updated successfully!");
+		response.setMessage("Payment status updated successfully for ID: " + id + ".");
 		response.setData(updatedPayment);
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	// Get payment by pagination and sorting
+	// Get payments with pagination and sorting
 	public ResponseEntity<ResponseStructure<Page<Payment>>> getPaymentByPageAndSort(int pageNumber, int pageSize,
 			String field) {
 		Page<Payment> payments = paymentDao.getPaymentByPageAndSort(pageNumber, pageSize, field);
+
 		if (payments.isEmpty()) {
-			throw new NoRecordAvailableException("No payment records found!");
+			throw new NoRecordAvailableException("No payment records found.");
 		}
 
 		ResponseStructure<Page<Payment>> response = new ResponseStructure<>();
 		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Payments retrieved successfully with pagination and sorting by " + field + "!");
+		response.setMessage("Payments retrieved successfully (page: " + pageNumber + ", size: " + pageSize
+				+ ", sorted by: " + field + ").");
 		response.setData(payments);
-
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

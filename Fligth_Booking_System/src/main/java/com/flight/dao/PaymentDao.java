@@ -34,22 +34,27 @@ public class PaymentDao {
 		return paymentRepository.findById(id);
 	}
 
-	// Get payment by status
+	// Get payments by status
 	public List<Payment> getPaymentByStatus(String status) {
 		return paymentRepository.findByStatus(status);
 	}
 
-	// Get payment by mode
+	// Get payments by mode
 	public List<Payment> getPaymentByMode(String mode) {
 		return paymentRepository.findByMode(mode);
 	}
-	
-	// update payment status
-	public  Payment updatePayment(Payment payment) {
+
+	// Get payments greater than a specific amount
+	public List<Payment> getPaymentAmountGreaterThan(Double amount) {
+		return paymentRepository.findByAmountGreaterThan(amount);
+	}
+
+	// Update payment
+	public Payment updatePayment(Payment payment) {
 		return paymentRepository.save(payment);
 	}
 
-	// Get payment with pagination and sorting
+	// Pagination and sorting
 	public Page<Payment> getPaymentByPageAndSort(int pageNumber, int pageSize, String field) {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(field));
 		return paymentRepository.findAll(pageable);

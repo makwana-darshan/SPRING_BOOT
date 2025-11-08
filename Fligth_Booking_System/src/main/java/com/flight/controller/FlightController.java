@@ -5,14 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.flight.dto.ResponseStructure;
 import com.flight.entity.Flight;
@@ -25,59 +18,58 @@ public class FlightController {
 	@Autowired
 	private FlightService flightService;
 
-	// Add flight
+	// Add single flight
 	@PostMapping
 	public ResponseEntity<ResponseStructure<Flight>> saveFlight(@RequestBody Flight flight) {
 		return flightService.saveFlight(flight);
 	}
 
-	// add multiple flight
+	// Add multiple flights
 	@PostMapping("/all")
-	public ResponseEntity<ResponseStructure<List<Flight>>> saveAllFlight(@RequestBody List<Flight> flight) {
-		return flightService.saveAllFlight(flight);
+	public ResponseEntity<ResponseStructure<List<Flight>>> saveAllFlight(@RequestBody List<Flight> flights) {
+		return flightService.saveAllFlight(flights);
 	}
 
-	// get all flight
+	// Get all flights
 	@GetMapping
-	public ResponseEntity<ResponseStructure<List<Flight>>> getAllFlight() {
+	public ResponseEntity<ResponseStructure<List<Flight>>> getAllFlights() {
 		return flightService.getAllFlight();
 	}
 
-	// get flight by id
+	// Get flight by ID
 	@GetMapping("/id/{id}")
 	public ResponseEntity<ResponseStructure<Flight>> getFlightById(@PathVariable Integer id) {
 		return flightService.getFlightById(id);
 	}
 
-	// get flight by source and destination
+	// Get flights by source and destination
 	@GetMapping("/sourceanddestination/{source}/{destination}")
 	public ResponseEntity<ResponseStructure<List<Flight>>> getFlightBySourceAndDestination(@PathVariable String source,
 			@PathVariable String destination) {
 		return flightService.getFlightBySourceAndDestination(source, destination);
 	}
 
-	// get flight by airline
+	// Get flights by airline
 	@GetMapping("/airline/{airline}")
-	public ResponseEntity<ResponseStructure<List<Flight>>> getFlightBySourceAndDestination(
-			@PathVariable String airline) {
+	public ResponseEntity<ResponseStructure<List<Flight>>> getFlightByAirline(@PathVariable String airline) {
 		return flightService.getFlightByAirline(airline);
 	}
 
-	// get flight by id
+	// Update flight
 	@PutMapping
-	public ResponseEntity<ResponseStructure<Flight>> getFlightById(@RequestBody Flight flight) {
+	public ResponseEntity<ResponseStructure<Flight>> updateFlight(@RequestBody Flight flight) {
 		return flightService.updateFlight(flight);
 	}
 
-	// delete flight
+	// Delete flight
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseStructure<String>> deleteBook(@PathVariable Integer id) {
+	public ResponseEntity<ResponseStructure<String>> deleteFlight(@PathVariable Integer id) {
 		return flightService.deleteFlight(id);
 	}
 
-	// paging and sorting
+	// Get paginated and sorted flights
 	@GetMapping("/paging/{pageNumber}/{pageSize}/{field}")
-	public ResponseEntity<ResponseStructure<Page<Flight>>> getBooksByPaging(@PathVariable int pageNumber,
+	public ResponseEntity<ResponseStructure<Page<Flight>>> getFlightsByPaging(@PathVariable int pageNumber,
 			@PathVariable int pageSize, @PathVariable String field) {
 		return flightService.getFlightByPageAndSort(pageNumber, pageSize, field);
 	}
