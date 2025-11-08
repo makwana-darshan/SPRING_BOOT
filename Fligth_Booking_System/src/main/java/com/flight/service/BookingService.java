@@ -46,8 +46,16 @@ public class BookingService {
 		booking.setFlight(flightOpt.get());
 
 		if (booking.getPassengers() != null && !booking.getPassengers().isEmpty()) {
-			booking.getPassengers().forEach(p -> p.setBooking(booking));
+			for (Passenger passenger : booking.getPassengers()) {
+				passenger.setBooking(booking);
+			}
 		}
+
+		int numberOfPassenger = booking.getPassengers().size();
+		double ticketPrice = booking.getFlight().getPrice();
+		booking.getPayment().setAmount(numberOfPassenger * ticketPrice);
+		booking.getPayment().setPaymentDate(LocalDateTime.now());
+		booking.getPayment().setBooking(booking);
 
 		response.setStatusCode(HttpStatus.CREATED.value());
 		response.setMessage("Booking created successfully.");

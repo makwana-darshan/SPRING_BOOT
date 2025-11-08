@@ -2,6 +2,9 @@ package com.flight.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +16,7 @@ public class Booking {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
+	@UpdateTimestamp
 	private LocalDateTime bookingDate;
 	private String status;
 
