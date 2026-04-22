@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.flight.dto.PaymentStatus;
 import com.flight.entity.Payment;
 import com.flight.repository.PaymentRepository;
 
@@ -35,7 +36,7 @@ public class PaymentDao {
 	}
 
 	// Get payments by status
-	public List<Payment> getPaymentByStatus(String status) {
+	public List<Payment> getPaymentByStatus(PaymentStatus status) {
 		return paymentRepository.findByStatus(status);
 	}
 

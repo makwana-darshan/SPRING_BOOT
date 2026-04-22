@@ -39,7 +39,7 @@ public class BookingController {
 	}
 
 	// Get booking by ID
-	@GetMapping("/{id}")
+	@GetMapping("/{id}")//proper data not available
 	public ResponseEntity<ResponseStructure<Booking>> getBookingById(@PathVariable Integer id) {
 		return bookingService.getBookingById(id);
 	}

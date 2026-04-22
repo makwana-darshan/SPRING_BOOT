@@ -112,6 +112,6 @@ public class PassengerService {
 				+ ", sorted by: " + field + ").");
 		response.setData(passengers);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<ResponseStructure<Page<Passenger>>>(response, HttpStatus.OK);
 	}
 }

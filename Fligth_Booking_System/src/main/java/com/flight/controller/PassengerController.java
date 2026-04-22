@@ -43,7 +43,7 @@ public class PassengerController {
 	}
 
 	// Get passenger by contact number
-	@GetMapping("/contact/{number}")
+	@GetMapping("/contact/{number}")//not working properly
 	public ResponseEntity<ResponseStructure<Passenger>> getPassengerByContactNumber(@PathVariable Long number) {
 		return passengerService.getPassengerByContactNumber(number);
 	}

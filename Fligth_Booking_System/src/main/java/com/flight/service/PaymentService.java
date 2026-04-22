@@ -63,7 +63,7 @@ public class PaymentService {
 
 	// Get payments by status
 	public ResponseEntity<ResponseStructure<List<Payment>>> getPaymentByStatus(String status) {
-		List<Payment> payments = paymentDao.getPaymentByStatus(status);
+		List<Payment> payments = paymentDao.getPaymentByStatus(PaymentStatus.valueOf(status.toUpperCase()));
 
 		if (payments.isEmpty()) {
 			throw new NoRecordAvailableException("No payments found with status: " + status + ".");
